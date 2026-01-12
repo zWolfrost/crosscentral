@@ -34,7 +34,7 @@ ul {
 li { padding: 0px 20px; }
 li:nth-child(odd) { background-color: #1a1a1a; }
 li:nth-child(even) { background-color: #252525; }
-li > a .fiv-viv { transform: scale(1.2); background-image: url("./icons/mp4.svg") }
+li > a .fiv-viv { transform: scale(1.2); }
 li > a { color: #8888ff; text-decoration: none; line-break: anywhere; }
 li > a.parent { color: #efce4a; text-decoration: underline; }
 li > a.folder { color: #d9d9d9; }

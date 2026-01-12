@@ -14,21 +14,25 @@
 			{% if path and not path.split("/")[-1].startswith(".") %}
 				<li><a class="parent" href="{{ url_for('browse', rel_path=path_parent) }}">⬅ Parent</a></li>
 			{% endif %}
-			{% for entry in entries %}
-				{% if not entry.filename.startswith(".") %}
-					<li>
-						{% if entry.is_dir %}
-							<a class="folder" href="{{ url_for('browse', rel_path=entry.filepath) }}">
-								<span class="fiv-viv fiv-icon-folder"></span> {{ entry.filename }}
-							</a>
-						{% else %}
-							<a class="file" target={{ "_blank" if entry.extension else "_self" }} href="{{ url_for('browse', rel_path=entry.filepath) }}">
-								<span class="fiv-viv{{ (' fiv-icon-' + entry.extension) if entry.extension else '' }}"></span> {{ entry.filename }}
-							</a>
-						{% endif %}
-					</li>
-				{% endif %}
-			{% endfor %}
+			{% if not error %}
+				{% for entry in entries %}
+					{% if not entry.filename.startswith(".") %}
+						<li>
+							{% if entry.is_dir %}
+								<a class="folder" href="{{ url_for('browse', rel_path=entry.filepath) }}">
+									<span class="fiv-viv fiv-icon-folder"></span> {{ entry.filename }}
+								</a>
+							{% else %}
+								<a class="file" target="{{ '_blank' if entry.extension else '_self' }}" href="{{ url_for('browse', rel_path=entry.filepath) }}">
+									<span class="fiv-viv{{ (' fiv-icon-' + entry.extension) if entry.extension else '' }}"></span> {{ entry.filename }}
+								</a>
+							{% endif %}
+						</li>
+					{% endif %}
+				{% endfor %}
+			{% else %}
+				<li><em>{{ error }}</em></li>
+			{% endif %}
 		</ul>
 	</body>
 </html>
