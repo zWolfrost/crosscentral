@@ -4,6 +4,9 @@ from werkzeug.utils import safe_join
 
 BASE_DIR = os.path.abspath("share")
 
+if not os.path.exists(BASE_DIR):
+	os.makedirs(BASE_DIR)
+
 with open("./static/directory.j2") as f:
    DIRECTORY_TEMPLATE = f.read()
 
