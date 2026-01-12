@@ -3,7 +3,6 @@ from flask import Flask, send_from_directory, abort, render_template_string
 from werkzeug.utils import safe_join
 
 BASE_DIR = os.path.abspath("share")
-PORT = 5000
 
 with open("./static/directory.j2") as f:
    DIRECTORY_TEMPLATE = f.read()
