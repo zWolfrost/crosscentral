@@ -17,6 +17,7 @@ def list_directory(rel_path):
 	for item in os.listdir(full_path):
 		entries.append({
 			"filename": item,
+			"extension": item.split('.')[-1] if '.' in item else '',
 			"filepath": os.path.join(rel_path, item),
 			"is_dir": os.path.isdir(os.path.join(full_path, item))
 		})
@@ -41,7 +42,7 @@ def browse(rel_path):
 		if os.path.isdir(full_path):
 			return list_directory(rel_path)
 		elif os.path.isfile(full_path):
-			return send_from_directory(BASE_DIR, rel_path, as_attachment=True)
+			return send_from_directory(BASE_DIR, rel_path, as_attachment=False)
 
 	abort(404)
 

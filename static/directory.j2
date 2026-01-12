@@ -5,7 +5,7 @@
 		<title>The Cross Central</title>
 		<meta name="viewport" content="width=device-width, initial-scale=0.75">
 		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/file-icon-vectors@1.0.0/dist/file-icon-vivid.min.css"/>
+		<link rel="stylesheet" href="{{ url_for('static', filename='icons.css') }}"/>
 	</head>
 
 	<body>
@@ -18,11 +18,13 @@
 				{% if not entry.filename.startswith(".") %}
 					<li>
 						{% if entry.is_dir %}
-							<span class="fiv-viv fiv-icon-folder"></span>
-							<a class="folder" href="{{ url_for('browse', rel_path=entry.filepath) }}">{{ entry.filename }}</a>
+							<a class="folder" href="{{ url_for('browse', rel_path=entry.filepath) }}">
+								<span class="fiv-viv fiv-icon-folder"></span> {{ entry.filename }}
+							</a>
 						{% else %}
-							<span class="fiv-viv fiv-icon-{{ entry.filename.split('.')[-1] }}"></span>
-							<a class="item" href="{{ url_for('browse', rel_path=entry.filepath) }}">{{ entry.filename }}</a>
+							<a class="file" target={{ "_blank" if entry.extension else "_self" }} href="{{ url_for('browse', rel_path=entry.filepath) }}">
+								<span class="fiv-viv{{ (' fiv-icon-' + entry.extension) if entry.extension else '' }}"></span> {{ entry.filename }}
+							</a>
 						{% endif %}
 					</li>
 				{% endif %}
