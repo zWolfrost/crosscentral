@@ -4,6 +4,6 @@ timeout = 600
 
 sendfile = False
 
-loglevel = "info"
+loglevel = "warning"
 accesslog = "-"
 errorlog = "-"
