@@ -1,5 +1,5 @@
 import os
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, Response, render_template
 from werkzeug.utils import safe_join
 import mimetypes
 
@@ -35,6 +35,11 @@ def render_directory(rel_path, error=None):
 		error=error
 	)
 
+def file_stream(filepath):
+	with open(filepath, "rb") as f:
+		while chunk := f.read(1024*1024):
+			yield chunk
+
 @app.route("/", defaults={"rel_path": ""})
 @app.route("/<path:rel_path>")
 def browse(rel_path):
@@ -52,7 +57,7 @@ def browse(rel_path):
 		return render_directory(rel_path)
 	elif os.path.isfile(full_path):
 		mime_type = mimetypes.guess_type(full_path)[0] or "application/octet-stream"
-		return send_from_directory(BASE_DIR, rel_path, mimetype=mime_type, as_attachment=False)
+		return Response(file_stream(full_path), headers={ "Content-Type": mime_type })
 	else:
 		return render_directory(rel_path, error="This file is broken."), 400
 
