@@ -24,7 +24,7 @@
 								</a>
 							{% else %}
 								<a class="file" target="{{ '_blank' if entry.extension else '_self' }}" href="{{ url_for('browse', rel_path=entry.filepath) }}">
-									<span class="fiv-viv{{ (' fiv-icon-' + entry.extension) if entry.extension else '' }}"></span> {{ entry.filename }}
+									<span class="fiv-viv fiv-icon-{{ entry.extension }}"></span> {{ entry.filename }}
 								</a>
 							{% endif %}
 						</li>
