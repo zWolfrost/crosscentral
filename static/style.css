@@ -45,6 +45,7 @@ li > a:active { filter: brightness(75%); }
 .preview {
 	display: block;
 	margin: 50px auto;
+	max-width: 90vw;
 	max-height: 70vh;
 	border-radius: 10px;
 	background-color: black;
