@@ -75,7 +75,7 @@ def browse(rel_path):
 		download = request.args.get("download") == "1"
 		if inline or download:
 			response = Response()
-			response.headers["X-Accel-Redirect"] = f"/_protected/{quote(rel_path)}"
+			response.headers["X-Accel-Redirect"] = f"/_protected/{quote(rel_path, safe='/')}"
 			response.headers["Content-Type"] = guess_mimetype(full_path)
 
 			if download:
