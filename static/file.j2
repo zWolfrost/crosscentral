@@ -27,12 +27,12 @@
 			{% if mimetype.startswith('image/') %}
 				<img class="preview" src="{{ url_for('browse', rel_path=path) }}?inline=1" alt="{{ filename }}"/>
 			{% elif mimetype.startswith('video/') %}
-				<video class="preview" controls>
+				<video class="preview" controls oncanplay="this.volume=0.2">
 					<source src="{{ url_for('browse', rel_path=path) }}?inline=1" type="{{ mimetype }}">
 					Your browser does not support this video tag.
 				</video>
 			{% elif mimetype.startswith('audio/') %}
-				<audio class="preview" controls>
+				<audio class="preview" controls oncanplay="this.volume=0.2">
 					<source src="{{ url_for('browse', rel_path=path) }}?inline=1" type="{{ mimetype }}">
 					Your browser does not support this audio element.
 				</audio>
