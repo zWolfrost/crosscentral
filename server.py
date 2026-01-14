@@ -1,6 +1,7 @@
 import os
 from flask import Flask, Response, request, render_template
 from werkzeug.utils import safe_join
+from urllib.parse import quote
 import mimetypes
 
 BASE_DIR = os.path.abspath("/srv/share")
@@ -74,7 +75,7 @@ def browse(rel_path):
 		download = request.args.get("download") == "1"
 		if inline or download:
 			response = Response()
-			response.headers["X-Accel-Redirect"] = f"/_protected/{rel_path}"
+			response.headers["X-Accel-Redirect"] = f"/_protected/{quote(rel_path)}"
 			response.headers["Content-Type"] = guess_mimetype(full_path)
 
 			if download:
