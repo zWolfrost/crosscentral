@@ -1,7 +1,6 @@
 import os
 from flask import Flask, Response, request, render_template
 from werkzeug.utils import safe_join
-from urllib.parse import quote
 import mimetypes
 
 BASE_DIR = os.path.abspath("/srv/share")
@@ -55,6 +54,18 @@ def render_file(rel_path, error=None):
 		error=error
 	)
 
+def send_file_nginx(rel_path,  as_attachment=False):
+	NGINX_PREFIX = "_protected"
+
+	response = Response()
+	response.headers["X-Accel-Redirect"] = f"/{NGINX_PREFIX}/{rel_path}"
+	response.headers["Content-Type"] = guess_mimetype(safe_join(BASE_DIR, rel_path))
+
+	if as_attachment:
+		response.headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(rel_path)}"'
+
+	return response
+
 @app.route("/", defaults={"rel_path": ""})
 @app.route("/<path:rel_path>")
 def browse(rel_path):
@@ -74,14 +85,7 @@ def browse(rel_path):
 		inline = request.args.get("inline") == "1"
 		download = request.args.get("download") == "1"
 		if inline or download:
-			response = Response()
-			response.headers["X-Accel-Redirect"] = f"/_protected/{quote(rel_path, safe='/')}"
-			response.headers["Content-Type"] = guess_mimetype(full_path)
-
-			if download:
-				response.headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(full_path)}"'
-
-			return response
+			return send_file_nginx(rel_path, as_attachment=download)
 		else:
 			return render_file(rel_path)
 	else:
