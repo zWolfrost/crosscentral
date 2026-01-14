@@ -1,12 +1,9 @@
 import os
-from flask import Flask, request, send_file, render_template
+from flask import Flask, Response, request, render_template
 from werkzeug.utils import safe_join
 import mimetypes
 
-BASE_DIR = os.path.abspath("share")
-
-if not os.path.exists(BASE_DIR):
-	os.makedirs(BASE_DIR)
+BASE_DIR = os.path.abspath("/srv/share")
 
 app = Flask(__name__, static_folder="static", template_folder="static")
 
@@ -76,7 +73,14 @@ def browse(rel_path):
 		inline = request.args.get("inline") == "1"
 		download = request.args.get("download") == "1"
 		if inline or download:
-			return send_file(full_path, mimetype=guess_mimetype(full_path), as_attachment=download)
+			response = Response()
+			response.headers["X-Accel-Redirect"] = f"/_protected/{rel_path}"
+			response.headers["Content-Type"] = guess_mimetype(full_path)
+
+			if download:
+				response.headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(full_path)}"'
+
+			return response
 		else:
 			return render_file(rel_path)
 	else:
