@@ -92,4 +92,4 @@ def browse(rel_path):
 		return render_directory(rel_path, error="This file is broken."), 400
 
 if __name__ == "__main__":
-	app.run(debug=True, extra_files=["./static/directory.j2", "./static/file.j2", "./static/style.css"])
+	app.run("127.0.0.1", 5000, debug=True, extra_files=["./static/directory.j2", "./static/file.j2", "./static/style.css"])
