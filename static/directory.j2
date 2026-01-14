@@ -23,7 +23,7 @@
 									<span class="fiv-viv fiv-icon-folder"></span> {{ entry.filename }}
 								</a>
 							{% else %}
-								<a class="file" target="{{ '_blank' if entry.extension else '_self' }}" href="{{ url_for('browse', rel_path=entry.filepath) }}">
+								<a class="file" href="{{ url_for('browse', rel_path=entry.filepath) }}">
 									<span class="fiv-viv fiv-icon-{{ entry.extension }}"></span> {{ entry.filename }}
 								</a>
 							{% endif %}

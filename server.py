@@ -1,5 +1,5 @@
 import os
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, request, send_file, render_template
 from werkzeug.utils import safe_join
 import mimetypes
 
@@ -9,6 +9,9 @@ if not os.path.exists(BASE_DIR):
 	os.makedirs(BASE_DIR)
 
 app = Flask(__name__, static_folder="static", template_folder="static")
+
+def guess_mimetype(filepath):
+	return mimetypes.guess_type(filepath)[0] or "application/octet-stream"
 
 def get_dir_entries(rel_path):
 	full_path = safe_join(BASE_DIR, rel_path)
@@ -35,6 +38,25 @@ def render_directory(rel_path, error=None):
 		error=error
 	)
 
+def render_file(rel_path, error=None):
+	SUPPORTED_PREVIEWS = [
+		"image/png", "image/jpeg", "image/gif", "image/bmp", "image/webp",
+		"video/mp4", "video/webm",
+		"audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/flac", "audio/x-flac"
+	]
+
+	mimetype = guess_mimetype(rel_path)
+
+	return render_template(
+		"file.j2",
+		filename=os.path.basename(rel_path),
+		mimetype=mimetype,
+		preview=(mimetype in SUPPORTED_PREVIEWS),
+		path=rel_path,
+		path_parent=os.path.dirname(rel_path),
+		error=error
+	)
+
 @app.route("/", defaults={"rel_path": ""})
 @app.route("/<path:rel_path>")
 def browse(rel_path):
@@ -44,17 +66,21 @@ def browse(rel_path):
 		return render_directory(rel_path, error="Nice try.")
 
 	if not os.path.exists(full_path):
-		return render_directory(rel_path, error="This directory does not exist."), 404
+		return render_directory(rel_path, error="This file/directory does not exist."), 404
 
 	if os.path.isdir(full_path):
 		if not os.listdir(full_path):
 			return render_directory(rel_path, error="This directory is empty.")
 		return render_directory(rel_path)
 	elif os.path.isfile(full_path):
-		mime_type = mimetypes.guess_type(full_path)[0] or "application/octet-stream"
-		return send_from_directory(BASE_DIR, rel_path, mimetype=mime_type, as_attachment=False)
+		inline = request.args.get("inline") == "1"
+		download = request.args.get("download") == "1"
+		if inline or download:
+			return send_file(full_path, mimetype=guess_mimetype(full_path), as_attachment=download)
+		else:
+			return render_file(rel_path)
 	else:
 		return render_directory(rel_path, error="This file is broken."), 400
 
 if __name__ == "__main__":
-	app.run(debug=True, extra_files=["./static/directory.j2", "./static/style.css"])
+	app.run(debug=True, extra_files=["./static/directory.j2", "./static/file.j2", "./static/style.css"])
