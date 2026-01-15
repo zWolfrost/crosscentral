@@ -37,6 +37,8 @@
 					<source src="{{ url_for('browse', rel_path=path) }}?inline=1" type="{{ mimetype }}">
 					Your browser does not support this audio element.
 				</audio>
+			{% elif mimetype.startswith('text/') %}
+				<pre class="preview">{{ preview_content }}</pre>
 			{% endif %}
 		{% endif %}
 	</body>

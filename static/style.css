@@ -50,6 +50,10 @@ li > a:active { filter: brightness(75%); }
 	border-radius: 10px;
 	background-color: black;
 }
+pre.preview {
+	padding: 10px;
+	white-space: pre-wrap;
+}
 
 audio.preview {
 	width: 50vw;

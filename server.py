@@ -39,16 +39,26 @@ def render_file(rel_path, error=None):
 	SUPPORTED_PREVIEWS = [
 		"image/png", "image/jpeg", "image/gif", "image/bmp", "image/webp",
 		"video/mp4", "video/webm",
-		"audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/flac", "audio/x-flac"
+		"audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/flac", "audio/x-flac",
+		"text/plain"
 	]
 
 	mimetype = guess_mimetype(rel_path)
+
+	preview_content = None
+
+	if mimetype.startswith("text/"):
+		LIMIT_PREVIEW_SIZE = 10 * 1024
+		full_path = safe_join(BASE_DIR, rel_path)
+		with open(full_path, "r", encoding="utf-8") as f:
+			preview_content = f.read(LIMIT_PREVIEW_SIZE)
 
 	return render_template(
 		"file.j2",
 		filename=os.path.basename(rel_path),
 		mimetype=mimetype,
 		preview=(mimetype in SUPPORTED_PREVIEWS),
+		preview_content=preview_content,
 		path=rel_path,
 		path_parent=os.path.dirname(rel_path),
 		error=error
