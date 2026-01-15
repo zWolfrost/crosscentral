@@ -17,7 +17,7 @@
 			{% if not error %}
 				<li>
 					<a class="file" href="{{ url_for('browse', rel_path=path) }}?download=1">
-						⬇️ Download "{{ path.split("/")[-1] }}"
+						⬇ Download "{{ path.split("/")[-1] }}"
 					</a>
 				</li>
 			{% else %}

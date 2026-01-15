@@ -48,7 +48,8 @@ li > a:active { filter: brightness(75%); }
 	max-width: 90vw;
 	max-height: 70vh;
 	border-radius: 10px;
-	background-color: black;
+	background-color: #333333;
+	box-shadow: 0px 0px 10px black;
 }
 pre.preview {
 	padding: 10px;
