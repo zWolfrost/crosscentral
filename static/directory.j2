@@ -12,8 +12,8 @@
 	<body>
 		<header>Index of <span class="path">/{{ path }}</span></header>
 		<ul>
-			{% if path and not path.split("/")[-1].startswith(".") %}
-				<li><a class="parent" href="{{ url_for('browse', rel_path=path_parent) }}">⬅ Parent</a></li>
+			{% if path and not basename(path).startswith(".") %}
+				<li><a class="parent" href="{{ url_for('browse', rel_path=dirname(path)) }}">⬅ Parent</a></li>
 			{% endif %}
 			{% if not error %}
 				{% for entry in entries %}

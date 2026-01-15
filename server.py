@@ -7,18 +7,32 @@ BASE_DIR = os.path.abspath("/srv/share")
 
 app = Flask(__name__, static_folder="static", template_folder="static")
 
-def guess_mimetype(filepath):
+app.jinja_env.autoescape = True
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
+app.jinja_env.globals.update(basename=os.path.basename)
+app.jinja_env.globals.update(dirname=os.path.dirname)
+
+def guess_mimetype(filepath: str):
 	return mimetypes.guess_type(filepath)[0] or "application/octet-stream"
 
-def get_dir_entries(rel_path):
-	full_path = safe_join(BASE_DIR, rel_path)
+def get_filename_extension(filename: str):
+	return filename.strip(".").split(".")[-1] if "." in filename.strip(".") else ""
+
+def get_file_content(rel_path: str, limit: int = 1024*16):
+	full_path: str = safe_join(BASE_DIR, rel_path)
+	with open(full_path, "r", encoding="utf-8") as f:
+		content = f.read(limit)
+	return content
+
+def get_dir_entries(rel_path: str):
+	full_path: str = safe_join(BASE_DIR, rel_path)
 
 	entries = []
-
 	for item in os.listdir(full_path):
 		entries.append({
 			"filename": item,
-			"extension": item.split('.')[-1] if '.' in item else '',
+			"extension": get_filename_extension(item),
 			"filepath": os.path.join(rel_path, item),
 			"is_dir": os.path.isdir(os.path.join(full_path, item))
 		})
@@ -26,16 +40,15 @@ def get_dir_entries(rel_path):
 
 	return entries
 
-def render_directory(rel_path, error=None):
+def render_directory(rel_path: str, error: str = None):
 	return render_template(
 		"directory.j2",
 		entries=get_dir_entries(rel_path) if not error else [],
 		path=rel_path,
-		path_parent=os.path.dirname(rel_path),
 		error=error
 	)
 
-def render_file(rel_path, error=None):
+def render_file(rel_path: str, error: str = None):
 	SUPPORTED_PREVIEWS = [
 		"image/png", "image/jpeg", "image/gif", "image/bmp", "image/webp",
 		"video/mp4", "video/webm",
@@ -43,28 +56,22 @@ def render_file(rel_path, error=None):
 		"text/plain"
 	]
 
+	filename = os.path.basename(rel_path)
 	mimetype = guess_mimetype(rel_path)
-
-	preview_content = None
-
-	if mimetype.startswith("text/"):
-		LIMIT_PREVIEW_SIZE = 10 * 1024
-		full_path = safe_join(BASE_DIR, rel_path)
-		with open(full_path, "r", encoding="utf-8") as f:
-			preview_content = f.read(LIMIT_PREVIEW_SIZE)
 
 	return render_template(
 		"file.j2",
-		filename=os.path.basename(rel_path),
-		mimetype=mimetype,
-		preview=(mimetype in SUPPORTED_PREVIEWS),
-		preview_content=preview_content,
+		entry={
+			"filename": filename,
+			"extension": get_filename_extension(filename),
+			"mimetype": mimetype if mimetype in SUPPORTED_PREVIEWS else "application/octet-stream",
+			"content": get_file_content(rel_path) if mimetype.startswith("text/") else None
+		},
 		path=rel_path,
-		path_parent=os.path.dirname(rel_path),
 		error=error
 	)
 
-def send_file_nginx(rel_path,  as_attachment=False):
+def send_file_nginx(rel_path: str,  as_attachment: bool = False):
 	NGINX_PREFIX = "_protected"
 
 	response = Response()
@@ -78,7 +85,7 @@ def send_file_nginx(rel_path,  as_attachment=False):
 
 @app.route("/", defaults={"rel_path": ""})
 @app.route("/<path:rel_path>")
-def browse(rel_path):
+def browse(rel_path: str):
 	full_path = safe_join(BASE_DIR, rel_path)
 
 	if not full_path or os.path.commonpath([BASE_DIR, full_path]) != BASE_DIR:
@@ -90,7 +97,8 @@ def browse(rel_path):
 	if os.path.isdir(full_path):
 		if not os.listdir(full_path):
 			return render_directory(rel_path, error="This directory is empty.")
-		return render_directory(rel_path)
+		else:
+			return render_directory(rel_path)
 	elif os.path.isfile(full_path):
 		inline = request.args.get("inline") == "1"
 		download = request.args.get("download") == "1"
