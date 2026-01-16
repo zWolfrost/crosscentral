@@ -1,12 +1,9 @@
 import os
 from flask import Flask, Response, request, render_template
 from werkzeug.utils import safe_join
-import mimetypes
+import content_types
 
 BASE_DIR = os.path.abspath("/srv/share")
-
-mimetypes.add_type("text/plain", ".log")
-mimetypes.add_type("audio/x-flac", ".flac")
 
 app = Flask(__name__, static_folder="static", template_folder="static")
 
@@ -16,14 +13,13 @@ app.jinja_env.lstrip_blocks = True
 app.jinja_env.globals.update(basename=os.path.basename)
 app.jinja_env.globals.update(dirname=os.path.dirname)
 
-def guess_mimetype(filepath: str, sep="-") -> str:
-	if os.path.isdir(filepath):
-		return f"inode{sep}directory"
-	return (mimetypes.guess_type(filepath)[0] or f"application/octet-stream").replace("/", sep, 1)
+def guess_mimetype(filepath: str, sep=":") -> str:
+	return f"inode{sep}directory" if os.path.isdir(filepath) \
+		else content_types.get_content_type(filepath, False).replace("/", sep, 1)
 
 def get_file_content(rel_path: str, limit: int = 1024*16):
 	full_path: str = safe_join(BASE_DIR, rel_path)
-	with open(full_path, "r", encoding="utf-8") as f:
+	with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
 		content = f.read(limit)
 	return content
 
@@ -37,7 +33,7 @@ def get_dir_entries(rel_path: str):
 			"mimetype": guess_mimetype(os.path.join(full_path, item)),
 			"filepath": os.path.join(rel_path, item)
 		})
-	entries = sorted(entries, key=lambda e: (e["mimetype"] != "inode-directory", e["filename"].lower()))
+	entries = sorted(entries, key=lambda e: (e["mimetype"] != "inode:directory", e["filename"].lower()))
 
 	return entries
 
@@ -51,8 +47,8 @@ def render_directory(rel_path: str, error: str = None):
 
 def render_file(rel_path: str, error: str = None):
 	SUPPORTED_PREVIEWS = [
-		"image-png", "image-jpeg", "image-gif", "image-bmp", "image-webp", "video-mp4", "video-webm",
-		"audio-mpeg", "audio-x-wav", "audio-ogg", "audio-x-flac", "text-plain"
+		"image:png", "image:jpeg", "image:gif", "image:bmp", "image:webp", "video:mp4", "video:webm",
+		"audio:mpeg", "audio:wav", "audio:ogg", "audio:flac", "text:plain"
 	]
 
 	filename = os.path.basename(rel_path)
@@ -62,8 +58,8 @@ def render_file(rel_path: str, error: str = None):
 		"file.j2",
 		entry={
 			"filename": filename,
-			"mimetype": mimetype if mimetype in SUPPORTED_PREVIEWS else "application-octet-stream",
-			"content": get_file_content(rel_path) if mimetype.startswith("text-") else None
+			"mimetype": mimetype if mimetype in SUPPORTED_PREVIEWS else "application:octet-stream",
+			"content": get_file_content(rel_path) if mimetype.startswith("text:") else None
 		},
 		path=rel_path,
 		error=error
