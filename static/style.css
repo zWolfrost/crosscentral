@@ -65,12 +65,11 @@ li > a:active { filter: brightness(75%); }
 img.preview {
 	image-rendering: crisp-edges;
 }
+audio.preview {
+	width: 50vw;
+}
 pre.preview {
 	padding: 10px;
 	max-height: unset;
 	white-space: pre-wrap;
-}
-
-audio.preview {
-	width: 50vw;
 }
