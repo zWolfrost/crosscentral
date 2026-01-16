@@ -5,6 +5,8 @@ import mimetypes
 
 BASE_DIR = os.path.abspath("/srv/share")
 
+mimetypes.add_type("audio-x-flac", ".flac")
+
 app = Flask(__name__, static_folder="static", template_folder="static")
 
 app.jinja_env.autoescape = True
