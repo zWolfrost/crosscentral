@@ -5,8 +5,8 @@ import mimetypes
 
 BASE_DIR = os.path.abspath("/srv/share")
 
-mimetypes.add_type("text-plain", ".log")
-mimetypes.add_type("audio-x-flac", ".flac")
+mimetypes.add_type("text/plain", ".log")
+mimetypes.add_type("audio/x-flac", ".flac")
 
 app = Flask(__name__, static_folder="static", template_folder="static")
 
