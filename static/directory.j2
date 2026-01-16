@@ -19,15 +19,9 @@
 				{% for entry in entries %}
 					{% if not entry.filename.startswith(".") %}
 						<li>
-							{% if entry.is_dir %}
-								<a class="folder" href="{{ url_for('browse', rel_path=entry.filepath) }}">
-									<span class="fiv-viv fiv-icon-folder"></span> {{ entry.filename }}
-								</a>
-							{% else %}
-								<a class="file" href="{{ url_for('browse', rel_path=entry.filepath) }}">
-									<span class="fiv-viv fiv-icon-{{ entry.extension }}"></span> {{ entry.filename }}
-								</a>
-							{% endif %}
+							<a class="{{ 'folder' if entry.mimetype == 'inode-directory' else 'file' }}" href="{{ url_for('browse', rel_path=entry.filepath) }}">
+								<span class="icon" style="background-image: url('static/icons/{{ entry.mimetype }}.svg');"></span> {{ entry.filename }}
+							</a>
 						</li>
 					{% endif %}
 				{% endfor %}

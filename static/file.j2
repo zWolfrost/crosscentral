@@ -21,19 +21,19 @@
 			{% endif %}
 		</ul>
 		{% if not error %}
-			{% if entry.mimetype.startswith('image/') %}
+			{% if entry.mimetype.startswith('image') %}
 				<img class="preview" src="{{ url_for('browse', rel_path=path) }}?inline=1" alt="{{ entry.filename }}"/>
-			{% elif entry.mimetype.startswith('video/') %}
+			{% elif entry.mimetype.startswith('video') %}
 				<video class="preview" controls oncanplay="this.volume=0.2">
-					<source src="{{ url_for('browse', rel_path=path) }}?inline=1" type="{{ entry.mimetype }}">
+					<source src="{{ url_for('browse', rel_path=path) }}?inline=1">
 					Your browser does not support this video tag.
 				</video>
-			{% elif entry.mimetype.startswith('audio/') %}
+			{% elif entry.mimetype.startswith('audio') %}
 				<audio class="preview" controls oncanplay="this.volume=0.2">
-					<source src="{{ url_for('browse', rel_path=path) }}?inline=1" type="{{ entry.mimetype }}">
+					<source src="{{ url_for('browse', rel_path=path) }}?inline=1">
 					Your browser does not support this audio element.
 				</audio>
-			{% elif entry.mimetype.startswith('text/') %}
+			{% elif entry.mimetype.startswith('text') %}
 				<pre class="preview">{{ entry.content }}</pre>
 			{% endif %}
 		{% endif %}

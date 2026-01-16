@@ -13,11 +13,10 @@ app.jinja_env.lstrip_blocks = True
 app.jinja_env.globals.update(basename=os.path.basename)
 app.jinja_env.globals.update(dirname=os.path.dirname)
 
-def guess_mimetype(filepath: str):
-	return mimetypes.guess_type(filepath)[0] or "application/octet-stream"
-
-def get_filename_extension(filename: str):
-	return filename.strip(".").split(".")[-1] if "." in filename.strip(".") else ""
+def guess_mimetype(filepath: str, sep="-") -> str:
+	if os.path.isdir(filepath):
+		return f"inode{sep}directory"
+	return (mimetypes.guess_type(filepath)[0] or f"application/octet-stream").replace("/", sep, 1)
 
 def get_file_content(rel_path: str, limit: int = 1024*16):
 	full_path: str = safe_join(BASE_DIR, rel_path)
@@ -32,11 +31,10 @@ def get_dir_entries(rel_path: str):
 	for item in os.listdir(full_path):
 		entries.append({
 			"filename": item,
-			"extension": get_filename_extension(item),
-			"filepath": os.path.join(rel_path, item),
-			"is_dir": os.path.isdir(os.path.join(full_path, item))
+			"mimetype": guess_mimetype(os.path.join(full_path, item)),
+			"filepath": os.path.join(rel_path, item)
 		})
-	entries = sorted(entries, key=lambda e: (not e["is_dir"], e["filename"].lower()))
+	entries = sorted(entries, key=lambda e: (e["mimetype"] != "inode-directory", e["filename"].lower()))
 
 	return entries
 
@@ -50,10 +48,8 @@ def render_directory(rel_path: str, error: str = None):
 
 def render_file(rel_path: str, error: str = None):
 	SUPPORTED_PREVIEWS = [
-		"image/png", "image/jpeg", "image/gif", "image/bmp", "image/webp",
-		"video/mp4", "video/webm",
-		"audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/flac", "audio/x-flac",
-		"text/plain"
+		"image-png", "image-jpeg", "image-gif", "image-bmp", "image-webp", "video-mp4", "video-webm",
+		"audio-mpeg", "audio-x-wav", "audio-ogg", "audio-x-flac", "text-plain"
 	]
 
 	filename = os.path.basename(rel_path)
@@ -63,9 +59,8 @@ def render_file(rel_path: str, error: str = None):
 		"file.j2",
 		entry={
 			"filename": filename,
-			"extension": get_filename_extension(filename),
-			"mimetype": mimetype if mimetype in SUPPORTED_PREVIEWS else "application/octet-stream",
-			"content": get_file_content(rel_path) if mimetype.startswith("text/") else None
+			"mimetype": mimetype if mimetype in SUPPORTED_PREVIEWS else "application-octet-stream",
+			"content": get_file_content(rel_path) if mimetype.startswith("text-") else None
 		},
 		path=rel_path,
 		error=error
