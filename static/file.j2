@@ -3,6 +3,11 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=0.75">
+		<meta property="og:url" content="{{ url_for('browse', rel_path=path, _external=True) }}">
+		<meta property="og:title" content="{{ entry.filename }}">
+		{% if not error and entry.mimetype.startswith('image:') %}
+			<meta property="og:image" content="{{ url_for('browse', rel_path=path) }}?inline=1">
+		{% endif %}
 		<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 		<title>{{ entry.filename }}</title>
 		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
