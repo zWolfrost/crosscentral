@@ -40,7 +40,7 @@ ul {
 	line-height: 1em;
 	width: .75em;
 }
-.icon:before { content: '\00a0' }
+.icon:before { content: "\00a0" }
 
 li { padding: 0px 20px; }
 li:nth-child(odd) { background-color: #1a1a1a; }
