@@ -39,7 +39,7 @@ def get_dir_entries(rel_path: str):
 
 def render_directory(rel_path: str, error: str = None):
 	return render_template(
-		"directory.j2",
+		"directory.jinja",
 		entries=get_dir_entries(rel_path) if not error else [],
 		path=rel_path,
 		error=error
@@ -55,7 +55,7 @@ def render_file(rel_path: str, error: str = None):
 	mimetype = guess_mimetype(rel_path)
 
 	return render_template(
-		"file.j2",
+		"file.jinja",
 		entry={
 			"filename": filename,
 			"mimetype": mimetype if mimetype in SUPPORTED_PREVIEWS else "application:octet-stream",
@@ -104,4 +104,4 @@ def browse(rel_path: str):
 		return render_directory(rel_path, error="This file is broken."), 400
 
 if __name__ == "__main__":
-	app.run("127.0.0.1", 5000, debug=True, extra_files=["./static/directory.j2", "./static/file.j2", "./static/style.css"])
+	app.run("127.0.0.1", 5000, debug=True, extra_files=["./static/directory.jinja", "./static/file.jinja", "./static/style.css"])
