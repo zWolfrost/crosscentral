@@ -6,6 +6,10 @@
 		<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 		<title>{{ basename(path) or 'The Cross Central' }}</title>
 		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+
+		{% for entry in entries %}
+			<link rel="preload" as="image" type="image/svg+xml" href="static/icons/{{ entry.mimetype }}.svg">
+		{% endfor %}
 	</head>
 
 	<body>
