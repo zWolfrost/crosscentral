@@ -8,7 +8,9 @@
 		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
 
 		{% for entry in entries %}
-			<link rel="preload" as="image" type="image/svg+xml" href="static/icons/{{ entry.mimetype }}.svg">
+			{% if not entry.filename.startswith(".") %}
+				<link rel="preload" as="image" type="image/svg+xml" href="static/icons/{{ entry.mimetype }}.svg">
+			{% endif %}
 		{% endfor %}
 	</head>
 
