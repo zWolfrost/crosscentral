@@ -15,7 +15,7 @@ app.jinja_env.globals.update(dirname=os.path.dirname)
 
 def guess_mimetype(filepath: str, sep=":") -> str:
 	return f"inode{sep}directory" if os.path.isdir(filepath) \
-		else content_types.get_content_type(filepath, False).replace("/", sep, 1)
+		else content_types.get_content_type(filepath, True).replace("/", sep, 1)
 
 def get_file_content(rel_path: str, limit: int = 1024*16):
 	full_path: str = safe_join(BASE_DIR, rel_path)
